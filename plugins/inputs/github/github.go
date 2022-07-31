@@ -4,7 +4,7 @@
 //
 // This software may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
-//
+
 package github
 
 import (
@@ -20,13 +20,6 @@ import (
 	"github.com/influxdata/telegraf/plugins/inputs"
 	"golang.org/x/oauth2"
 )
-
-const undefined = "<undefined>"
-
-var plugin = undefined
-var version = undefined
-var goos = undefined
-var goarch = undefined
 
 type GitHub struct {
 	Repos       []string `toml:"repos"`
@@ -46,7 +39,7 @@ func NewGitHub() *GitHub {
 		Timeout:     5}
 }
 
-func (gh *GitHub) SampleConfig() string {
+func (plugin *GitHub) SampleConfig() string {
 	return `
   ## The repositories (<owner>/<repo>) to query
   repos = ["influxdata/telegraf"]
@@ -61,30 +54,30 @@ func (gh *GitHub) SampleConfig() string {
  `
 }
 
-func (gh *GitHub) Description() string {
+func (plugin *GitHub) Description() string {
 	return "Gather GitHub stats"
 }
 
-func (gh *GitHub) Gather(a telegraf.Accumulator) error {
-	if len(gh.Repos) == 0 {
+func (plugin *GitHub) Gather(a telegraf.Accumulator) error {
+	if len(plugin.Repos) == 0 {
 		return errors.New("github: Empty repo list")
 	}
 	ctx := context.Background()
-	client, err := gh.getClient(ctx)
+	client, err := plugin.getClient(ctx)
 	if err != nil {
 		return err
 	}
-	for _, repo := range gh.Repos {
-		a.AddError(gh.processRepo(ctx, client, a, repo))
+	for _, repo := range plugin.Repos {
+		a.AddError(plugin.processRepo(ctx, client, a, repo))
 	}
 	return nil
 }
 
-func (gh *GitHub) processRepo(ctx context.Context, client *githubApi.Client, a telegraf.Accumulator, repo string) error {
-	if gh.Debug {
-		gh.Log.Infof("Processing repo: %s", repo)
+func (plugin *GitHub) processRepo(ctx context.Context, client *githubApi.Client, a telegraf.Accumulator, repo string) error {
+	if plugin.Debug {
+		plugin.Log.Infof("Processing repo: %s", repo)
 	}
-	repoOwner, repoName, err := gh.splitRepoId(repo)
+	repoOwner, repoName, err := plugin.splitRepoId(repo)
 	if err != nil {
 		return err
 	}
@@ -107,7 +100,7 @@ func (gh *GitHub) processRepo(ctx context.Context, client *githubApi.Client, a t
 	var totalViews int
 	var uniqueViews int
 
-	if gh.AccessToken != "" {
+	if plugin.AccessToken != "" {
 		repoTrafficViews, _, err := client.Repositories.ListTrafficViews(ctx, repoOwner, repoName, &githubApi.TrafficBreakdownOptions{Per: "day"})
 		if err != nil {
 			return err
@@ -133,7 +126,7 @@ func (gh *GitHub) processRepo(ctx context.Context, client *githubApi.Client, a t
 	return nil
 }
 
-func (gh *GitHub) splitRepoId(repo string) (string, string, error) {
+func (plugin *GitHub) splitRepoId(repo string) (string, string, error) {
 	repoParts := strings.Split(repo, "/")
 	if len(repoParts) != 2 {
 		return "", "", fmt.Errorf("github: Invalid repo identifier '%s'", repo)
@@ -141,31 +134,31 @@ func (gh *GitHub) splitRepoId(repo string) (string, string, error) {
 	return repoParts[0], repoParts[1], nil
 }
 
-func (gh *GitHub) getClient(ctx context.Context) (*githubApi.Client, error) {
-	if gh.Debug {
-		gh.Log.Debug("Creating GitHub client...")
+func (plugin *GitHub) getClient(ctx context.Context) (*githubApi.Client, error) {
+	if plugin.Debug {
+		plugin.Log.Debug("Creating GitHub client...")
 	}
 	transport := &http.Transport{
 		Proxy:                 http.ProxyFromEnvironment,
-		ResponseHeaderTimeout: time.Duration(gh.Timeout) * time.Second,
+		ResponseHeaderTimeout: time.Duration(plugin.Timeout) * time.Second,
 	}
 	httpClient := &http.Client{
 		Transport: transport,
-		Timeout:   time.Duration(gh.Timeout) * time.Second,
+		Timeout:   time.Duration(plugin.Timeout) * time.Second,
 	}
-	if gh.AccessToken != "" {
-		if gh.Debug {
-			gh.Log.Debug("Using oauth2 access token...")
+	if plugin.AccessToken != "" {
+		if plugin.Debug {
+			plugin.Log.Debug("Using oauth2 access token...")
 		}
-		token := &oauth2.Token{AccessToken: gh.AccessToken}
+		token := &oauth2.Token{AccessToken: plugin.AccessToken}
 		tokenSource := oauth2.StaticTokenSource(token)
 		httpClient = oauth2.NewClient(ctx, tokenSource)
 	}
-	if gh.APIBaseURL != "" {
-		if gh.Debug {
-			gh.Log.Debug("Using API base URL: '%s'...", gh.APIBaseURL)
+	if plugin.APIBaseURL != "" {
+		if plugin.Debug {
+			plugin.Log.Debug("Using API base URL: '%s'...", plugin.APIBaseURL)
 		}
-		return githubApi.NewEnterpriseClient(gh.APIBaseURL, "", httpClient)
+		return githubApi.NewEnterpriseClient(plugin.APIBaseURL, "", httpClient)
 	}
 	return githubApi.NewClient(httpClient), nil
 }

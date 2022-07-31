@@ -4,7 +4,7 @@
 //
 // This software may be modified and distributed under the terms
 // of the MIT license.  See the LICENSE file for details.
-//
+
 package github
 
 import (
@@ -19,19 +19,19 @@ import (
 )
 
 func TestInit(t *testing.T) {
-	gh := NewGitHub()
-	require.NotNil(t, gh)
+	plugin := NewGitHub()
+	require.NotNil(t, plugin)
 }
 
 func TestSampleConfig(t *testing.T) {
-	gh := NewGitHub()
-	sampleConfig := gh.SampleConfig()
+	plugin := NewGitHub()
+	sampleConfig := plugin.SampleConfig()
 	require.NotNil(t, sampleConfig)
 }
 
 func TestDescription(t *testing.T) {
-	gh := NewGitHub()
-	description := gh.Description()
+	plugin := NewGitHub()
+	description := plugin.Description()
 	require.NotNil(t, description)
 }
 
@@ -39,16 +39,16 @@ func TestGather1(t *testing.T) {
 	testServerHandler := &testServerHandler{Debug: true}
 	testServer := httptest.NewServer(testServerHandler)
 	defer testServer.Close()
-	gh := NewGitHub()
-	gh.Repos = []string{"repo_owner/repo_name"}
-	gh.APIBaseURL = testServer.URL
-	gh.AccessToken = "secret_token"
-	gh.Log = createDummyLogger()
-	gh.Debug = testServerHandler.Debug
+	plugin := NewGitHub()
+	plugin.Repos = []string{"repo_owner/repo_name"}
+	plugin.APIBaseURL = testServer.URL
+	plugin.AccessToken = "secret_token"
+	plugin.Log = createDummyLogger()
+	plugin.Debug = testServerHandler.Debug
 
 	var a testutil.Accumulator
 
-	require.NoError(t, a.GatherError(gh.Gather))
+	require.NoError(t, a.GatherError(plugin.Gather))
 	require.True(t, a.HasMeasurement("github_info"))
 }
 
