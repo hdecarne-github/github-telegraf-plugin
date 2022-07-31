@@ -16,7 +16,6 @@
 
 # Build artifacts
 build/*
-.go/*
 .vscode/*
 
 # Local configs
