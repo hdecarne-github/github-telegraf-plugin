@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	_ "github.com/hdecarne/github-telegraf-plugin/plugins/inputs/github"
+	_ "github.com/hdecarne-github/github-telegraf-plugin/plugins/inputs/github"
 
 	"github.com/influxdata/telegraf/plugins/common/shim"
 )

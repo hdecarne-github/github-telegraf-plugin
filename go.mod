@@ -1,4 +1,4 @@
-module github.com/hdecarne/github-telegraf-plugin
+module github.com/hdecarne-github/github-telegraf-plugin
 
 go 1.16
 
