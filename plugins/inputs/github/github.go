@@ -36,7 +36,8 @@ func NewGitHub() *GitHub {
 	return &GitHub{
 		Repos:       []string{},
 		AccessToken: "",
-		Timeout:     5}
+		Timeout:     10,
+	}
 }
 
 func (plugin *GitHub) SampleConfig() string {
@@ -48,7 +49,7 @@ func (plugin *GitHub) SampleConfig() string {
   ## The Personal Access Token to use for API access
   # access_token = ""
   ## The http timeout to use (in seconds)
-  # timeout = 5
+  # timeout = 10
   ## Enable debug output
   # debug = false
  `
