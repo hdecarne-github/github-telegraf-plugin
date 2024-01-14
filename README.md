@@ -26,7 +26,7 @@ To use it you have to create a plugin specific config file (e.g. /etc/telegraf/g
   ## The Personal Access Token to use for API access
   # access_token = ""
   ## The http timeout to use (in seconds)
-  # timeout = 5
+  # timeout = 10
   ## Enable debug output
   # debug = false
 ```
