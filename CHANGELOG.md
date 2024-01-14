@@ -13,3 +13,7 @@ SOFTWARE.
 
 ### v0.1.0 (2022-08-05)
 * Initial release
+
+### v0.2.0 (2024-01-14)
+* Chenge default client timeout to 10s
+* Update dependencies
